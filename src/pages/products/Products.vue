@@ -48,12 +48,20 @@
         </q-td>
       </template>
     </q-table>
+    <ProductList
+      :products="filteredProducts"
+      :filter="filter"
+      @set-filters="filtersChanged"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { api } from 'src/boot/axios';
-import { defineComponent } from 'vue';
+import { Filter } from 'src/models/filter';
+import { Product } from 'src/models/product';
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+import ProductList from '../Products.vue';
 
 const columns = [
   {
@@ -96,6 +104,7 @@ const columns = [
 
 export default defineComponent({
   name: 'ProductsPage',
+  components: { ProductList },
   data() {
     return {
       products: [],
@@ -116,6 +125,52 @@ export default defineComponent({
         this.fetchProducts();
       }
     },
+  },
+
+  setup() {
+    const allProducts = ref<Product[]>([]);
+    const filteredProducts = ref<Product[]>([]);
+    const filter = reactive<Filter>({
+      s: '',
+      sort: '',
+      page: 1,
+    });
+    onMounted(async () => {
+      const { data } = await api.get('products/frontend');
+
+      allProducts.value = data;
+      filteredProducts.value = data;
+    });
+
+    const filtersChanged = (f: Filter) => {
+      filter.s = f.s;
+      filter.sort = f.sort;
+      let products = allProducts.value.filter(
+        (p) =>
+          p.title.toLowerCase().indexOf(filter.s.toLowerCase()) >= 0 ||
+          p.description.toLowerCase().indexOf(filter.s.toLowerCase()) >= 0
+      );
+
+      if (filter.sort === 'asc') {
+        products.sort((a, b) => {
+          const diff = a.price - b.price;
+          if (diff === 0) {
+            return 0;
+          }
+
+          const sign = Math.abs(diff) / diff;
+
+          return filter.sort === 'asc' ? sign : -sign;
+        });
+      }
+
+      filteredProducts.value = products;
+    };
+    return {
+      filteredProducts,
+      filter,
+      filtersChanged,
+    };
   },
 });
 </script>

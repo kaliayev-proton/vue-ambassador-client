@@ -1,5 +1,11 @@
 <template>
-  <router-link clickable :to="link" class="no-underline" active-class="active">
+  <router-link
+    clickable
+    :to="link"
+    link-secondary
+    class="no-underline"
+    exact-active-class="active"
+  >
     <q-item>
       <q-item-section v-if="icon" avatar>
         <q-icon :name="icon" />

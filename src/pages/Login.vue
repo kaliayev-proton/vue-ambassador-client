@@ -33,6 +33,13 @@
           flat
           class="q-ml-sm"
         ></q-btn>
+        <q-btn
+          label="Registry"
+          color="primary"
+          flat
+          class="q-ml-sm"
+          @click="$router.push('/register')"
+        ></q-btn>
       </div>
     </q-form>
   </q-page>

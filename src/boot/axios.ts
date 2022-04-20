@@ -14,7 +14,7 @@ declare module '@vue/runtime-core' {
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/admin/',
+  baseURL: 'http://localhost:8000/api/ambassador/',
   withCredentials: true, // with this param we retrieve the cookie from the backend
 });
 

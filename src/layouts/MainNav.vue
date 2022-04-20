@@ -16,28 +16,16 @@ import EssentialLink from 'components/EssentialLink.vue';
 
 const linksList = [
   {
-    title: 'Users',
+    title: 'Frontend',
     caption: 'quasar.dev',
     icon: 'school',
-    link: '/users',
+    link: '/',
   },
   {
-    title: 'Products',
-    caption: 'quasar.dev',
+    title: 'Backend',
+    caption: 'Backend component',
     icon: 'record_voice_over',
-    link: '/products',
-  },
-  {
-    title: 'Orders',
-    caption: 'quasar.dev',
-    icon: 'public',
-    link: '/orders',
-  },
-  {
-    title: 'Profile',
-    caption: 'quasar.dev',
-    icon: 'chat',
-    link: '/profile',
+    link: '/backend',
   },
 ];
 export default defineComponent({

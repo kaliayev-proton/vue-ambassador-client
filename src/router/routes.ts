@@ -13,12 +13,16 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', redirect: '/users' },
-      { path: '/users', component: () => import('pages/Users.vue') },
-      { path: '/users/:id/links', component: () => import('pages/Links.vue') },
+      // { path: '', redirect: '/users' },
+      // { path: '/users', component: () => import('pages/Users.vue') },
+      // { path: '/users/:id/links', component: () => import('pages/Links.vue') },
       {
-        path: '/products',
+        path: '/',
         component: () => import('src/pages/products/Products.vue'),
+      },
+      {
+        path: '/backend',
+        component: () => import('src/pages/ProductsBackend.vue'),
       },
       {
         path: '/products/create',
@@ -35,6 +39,14 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/profile',
         component: () => import('src/pages/Profile.vue'),
+      },
+      {
+        path: '/stats',
+        component: () => import('src/pages/Stats.vue'),
+      },
+      {
+        path: '/rankings',
+        component: () => import('src/pages/Rankings.vue'),
       },
     ],
   },

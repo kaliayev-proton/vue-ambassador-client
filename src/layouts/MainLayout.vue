@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <MainHeader @toggleLeftDrawer="toggleLeftDrawer" @logout="logout" />
+    <MainHeader @toggleLeftDrawer="toggleLeftDrawer" />
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <MainNav />
@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { api } from 'src/boot/axios';
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import MainNav from './MainNav.vue';
 import MainHeader from './MainHeader.vue';
@@ -37,23 +37,25 @@ export default defineComponent({
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
-    async logout() {
-      await api.post('logout');
+    // async logout() {
+    //   await api.post('logout');
 
-      this.$router.push('/login');
-    },
+    //   this.$router.push('/login');
+    // },
   },
 
-  async mounted() {
-    const router = useRouter();
-    try {
-      const { data } = await api.get('user');
+  setup() {
+    onMounted(async () => {
+      const router = useRouter();
       const UserStore = useUserStore();
+      try {
+        const { data } = await api.get('user');
 
-      UserStore.setUser(data);
-    } catch {
-      router.push('/login');
-    }
+        UserStore.setUser(data);
+      } catch {
+        router.push('/login');
+      }
+    });
   },
 });
 </script>
