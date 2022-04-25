@@ -22,13 +22,13 @@ const columns = [
     name: 'link',
     label: 'Link',
     align: 'left',
-    field: 'link',
+    field: 'code',
   },
   {
     name: 'users',
     label: 'Users',
     align: 'left',
-    field: 'users',
+    field: 'count',
   },
   {
     name: 'revenue',
@@ -46,8 +46,10 @@ export default defineComponent({
 
     onMounted(async () => {
       const { data } = await api.get('stats');
-      console.log(data);
-      links.value = data;
+      links.value = data.map((item: any) => {
+        item.code = `${process.env.VUE_APP_CHECKOUT_URL}/${item.code}`;
+        return item;
+      });
     });
 
     const checkoutUrl = (code: string) =>

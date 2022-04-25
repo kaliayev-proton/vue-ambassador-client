@@ -1,4 +1,14 @@
 <template>
+  <div class="q-pa-md" v-if="links">
+    <q-banner inline-actions rounded class="bg-green text-white">{{
+      links
+    }}</q-banner>
+  </div>
+  <div class="q-pa-md" v-if="error">
+    <q-banner inline-actions rounded class="bg-red text-white">{{
+      error
+    }}</q-banner>
+  </div>
   <div class="q-pa-md" style="max-width: 300px">
     <input outlined label="Outlined" @keyup="search($event.target.value)" />
   </div>
@@ -9,6 +19,14 @@
       <option value="desc">Price Descending</option>
     </select>
   </div>
+  <div class="q-pa-md" v-if="selected.length > 0">
+    <q-btn
+      color="green"
+      text-color="white"
+      label="Generate Link"
+      @click="generateLink()"
+    />
+  </div>
   <div class="q-pa-md products-grid">
     <q-card
       flat
@@ -16,6 +34,8 @@
       class="my-card bg-grey-1"
       v-for="product in products"
       :key="product.id"
+      @click="select(product.id)"
+      :class="selected.some((s) => s === product.id) ? 'card selected' : 'card'"
     >
       <img :src="product.image" height="100" />
       <q-card-section>
@@ -57,19 +77,23 @@
       </q-card-actions>
     </q-card>
   </div>
-  <div class="q-pa-md">
+  <div class="q-pa-md" v-if="filter.page < lastPage">
     <q-btn color="blue" text-color="white" @click="loadMore">Load more</q-btn>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, SetupContext } from 'vue';
+import { api } from 'src/boot/axios';
+import { defineComponent, ref, SetupContext } from 'vue';
 
 export default defineComponent({
   name: 'ProductList',
-  props: ['products', 'filter'],
+  props: ['products', 'filter', 'lastPage'],
   emits: ['set-filters'],
   setup(props: any, context: SetupContext) {
+    const selected = ref<number[]>([]);
+    const links = ref('');
+    const error = ref('');
     const search = (s: string) => {
       context.emit('set-filters', { ...props.filter, s, page: 1 });
     };
@@ -85,15 +109,56 @@ export default defineComponent({
       });
     };
 
-    return { search, sort, loadMore };
+    const select = (id: number) => {
+      if (selected.value.some((s) => s === id)) {
+        selected.value = selected.value.filter((s) => s !== id);
+        return;
+      }
+      selected.value = [...selected.value, id];
+    };
+
+    const generateLink = async () => {
+      try {
+        const { data } = await api.post('links', {
+          products: selected.value,
+        });
+
+        links.value = `Link generated: ${process.env.VUE_APP_CHECKOUT_URL}/${data.code}`;
+      } catch {
+        error.value = 'You should be logged in to generate a link!';
+      } finally {
+        setTimeout(() => {
+          links.value = '';
+          error.value = '';
+        }, 5000);
+      }
+    };
+
+    return {
+      search,
+      sort,
+      loadMore,
+      select,
+      selected,
+      generateLink,
+      links,
+      error,
+    };
   },
 });
 </script>
 
-<style>
+<style scoped>
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1rem;
+}
+
+.card {
+  cursor: pointer;
+}
+.card.selected {
+  border: 4px solid darkcyan;
 }
 </style>

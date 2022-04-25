@@ -51,6 +51,7 @@
     <ProductList
       :products="filteredProducts"
       :filter="filter"
+      :lastPage="lastPage"
       @set-filters="filtersChanged"
     />
   </div>
@@ -135,16 +136,20 @@ export default defineComponent({
       sort: '',
       page: 1,
     });
+    const perPage = 9;
+    const lastPage = ref(0);
     onMounted(async () => {
       const { data } = await api.get('products/frontend');
 
       allProducts.value = data;
-      filteredProducts.value = data;
+      filteredProducts.value = data.slice(0, filter.page * perPage);
+      lastPage.value = Math.ceil(data.length / perPage);
     });
 
     const filtersChanged = (f: Filter) => {
       filter.s = f.s;
       filter.sort = f.sort;
+      filter.page = f.page;
       let products = allProducts.value.filter(
         (p) =>
           p.title.toLowerCase().indexOf(filter.s.toLowerCase()) >= 0 ||
@@ -164,12 +169,15 @@ export default defineComponent({
         });
       }
 
-      filteredProducts.value = products;
+      lastPage.value = Math.ceil(products.length / perPage);
+
+      filteredProducts.value = products.slice(0, filter.page * perPage);
     };
     return {
       filteredProducts,
       filter,
       filtersChanged,
+      lastPage,
     };
   },
 });

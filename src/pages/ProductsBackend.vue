@@ -1,5 +1,10 @@
 <template>
-  <ProductList :products="products" :filter="filter" @set-filters="load" />
+  <ProductList
+    :products="products"
+    :filter="filter"
+    @set-filters="load"
+    :lastPage="lastPage"
+  />
 </template>
 
 <script lang="ts">
@@ -19,6 +24,7 @@ export default defineComponent({
       sort: '',
       page: 1,
     });
+    const lastPage = ref(0);
     const load = async (f: Filter) => {
       filter.s = f.s;
       filter.sort = f.sort;
@@ -34,10 +40,10 @@ export default defineComponent({
         arr.push(`page=${filter.page}`);
       }
       const { data } = await api.get(`products/backend?${arr.join('&')}`);
-      console.log(data);
 
       products.value =
         filter.page === 1 ? data.data : [...products.value, ...data.data];
+      lastPage.value = data.last_page;
     };
     onMounted(() => {
       load(filter);
@@ -46,6 +52,7 @@ export default defineComponent({
       products,
       filter,
       load,
+      lastPage,
     };
   },
 });
